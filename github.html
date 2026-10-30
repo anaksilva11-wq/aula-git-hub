@@ -1,0 +1,1025 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>GitHub do Zero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: um caderno de estudo em coluna única; cada branch é uma "linha de metrô" colorida que atravessa as ilustrações */
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --surface-2:#e9edf5; --ink:#141d2e; --muted:#566178; --rule:#d5dbe7;
+  --main:#2350c8; --main-soft:#dfe7fb;
+  --feat:#c25512; --feat-soft:#fbe7d8;
+  --fix:#0b8270; --fix-soft:#d6f0eb;
+  --bad:#b3261e; --bad-soft:#fbe1df;
+  --good:#1b7a39; --good-soft:#dcf1e2;
+  --code-bg:#172033; --code-fg:#e4e9f3; --code-dim:#8f9bb3; --code-prompt:#79d8bd; --code-warn:#ffb27a;
+  --shadow:0 1px 2px rgba(20,29,46,.06),0 10px 28px rgba(20,29,46,.07);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e131c; --surface:#161d2a; --surface-2:#1d2636; --ink:#e6ebf4; --muted:#9aa5b9; --rule:#2a3446;
+    --main:#7899ff; --main-soft:#1d294a; --feat:#ff9651; --feat-soft:#3b2615; --fix:#3cc6ad; --fix-soft:#12322d;
+    --bad:#ff7b72; --bad-soft:#3d1c1b; --good:#56d27f; --good-soft:#163420;
+    --code-bg:#0a0e16; --code-fg:#e4e9f3; --code-dim:#7f8aa1; --code-prompt:#79d8bd; --code-warn:#ffb27a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e131c; --surface:#161d2a; --surface-2:#1d2636; --ink:#e6ebf4; --muted:#9aa5b9; --rule:#2a3446;
+  --main:#7899ff; --main-soft:#1d294a; --feat:#ff9651; --feat-soft:#3b2615; --fix:#3cc6ad; --fix-soft:#12322d;
+  --bad:#ff7b72; --bad-soft:#3d1c1b; --good:#56d27f; --good-soft:#163420;
+  --code-bg:#0a0e16; --code-fg:#e4e9f3; --code-dim:#7f8aa1; --code-prompt:#79d8bd; --code-warn:#ffb27a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6}
+.page{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.7rem,8vw,4.8rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:clamp(1.8rem,4.4vw,2.6rem);font-weight:750;letter-spacing:-.015em}
+h3{font-size:1.3rem;font-weight:700}
+h4{font-size:1.02rem;font-weight:700}
+p{margin:0}
+a{color:var(--main);text-underline-offset:3px}
+code,kbd{font-family:var(--f-mono);font-size:.88em}
+:not(pre)>code{background:var(--surface-2);padding:.1em .38em;border-radius:5px}
+.prose{max-width:65ch;display:grid;gap:14px}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+.eyebrow .line{display:inline-block;width:28px;height:6px;border-radius:3px;background:var(--main)}
+.eyebrow.feat .line{background:var(--feat)} .eyebrow.fix .line{background:var(--fix)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding-block:24px 36px}
+.hero-text{display:grid;gap:18px;min-width:0}
+.lede{font-size:1.15rem;color:var(--muted);max-width:52ch}
+.hero-art{margin:0;min-width:0}
+.hero-art svg{width:100%;height:auto;display:block}
+.hero-art figcaption{font-size:.85rem;color:var(--muted);margin-top:6px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+
+.roteiro{border-top:1px solid var(--rule);padding-block:22px 8px}
+.roteiro ol{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 20px;counter-reset:r}
+.roteiro li{counter-increment:r}
+.roteiro a{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--ink);padding:6px 0;border-bottom:1px dashed var(--rule)}
+.roteiro a::before{content:counter(r,decimal-leading-zero);font-family:var(--f-mono);font-size:.78rem;color:var(--main)}
+.roteiro a:hover{color:var(--main)}
+
+section{border-top:1px solid var(--rule);padding-block:56px 8px;display:grid;gap:26px;scroll-margin-top:12px}
+.sec-head{display:grid;gap:12px}
+
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:20px;box-shadow:var(--shadow);display:grid;gap:16px;min-width:0}
+.panel-title{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.panel-title small{color:var(--muted);font-size:.85rem}
+
+/* buttons */
+.controls{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font-family:var(--f-mono);font-size:.86rem;font-weight:600;padding:9px 14px;border-radius:9px;border:1px solid var(--rule);background:var(--surface-2);color:var(--ink);cursor:pointer;transition:transform .15s, background .15s, border-color .15s}
+.btn:hover{transform:translateY(-1px);border-color:var(--muted)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.cmd{background:var(--code-bg);color:var(--code-fg);border-color:var(--code-bg)}
+.btn.cmd::before{content:"$ ";color:var(--code-prompt)}
+.btn.ghost{background:transparent}
+.btn.primary{background:var(--main);border-color:var(--main);color:#fff}
+:focus-visible{outline:3px solid var(--main);outline-offset:2px;border-radius:6px}
+
+/* terminal */
+.term{background:var(--code-bg);color:var(--code-fg);font-family:var(--f-mono);font-size:.82rem;line-height:1.55;border-radius:10px;padding:12px 16px;min-height:7.6em;margin:0;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.term .p{color:var(--code-prompt)} .term .o{color:var(--code-dim)} .term .w{color:var(--code-warn)}
+.term-line{animation:termIn .3s ease both}
+@keyframes termIn{from{opacity:0;transform:translateY(4px)}}
+
+/* compare */
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.duo{grid-template-columns:1fr}}
+.duo-card{background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:20px;display:grid;gap:12px;align-content:start}
+.duo-card svg{width:100%;max-width:260px;height:auto}
+.duo-card .tag-word{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.table-wrap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--f-mono);font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:var(--surface-2)}
+td:first-child{font-weight:700;white-space:nowrap}
+
+/* areas demo */
+.areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:680px){.areas{grid-template-columns:1fr}}
+.area{background:var(--surface-2);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start;min-height:180px;min-width:0}
+.area h4{display:flex;gap:8px;align-items:center}
+.area h4 .n{font-family:var(--f-mono);font-size:.75rem;width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;background:var(--surface);border:1px solid var(--rule)}
+.area-sub{font-size:.82rem;color:var(--muted)}
+.drop{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:92px}
+#drop-repo{flex-direction:column;flex-wrap:nowrap}
+.chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.8rem;padding:6px 10px;border-radius:7px;background:var(--feat-soft);color:var(--ink);border:1px solid var(--rule);max-width:100%}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--feat);flex:none}
+.chip.staged{background:var(--fix-soft)} .chip.staged .dot{background:var(--fix)}
+.commit-card{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--rule);border-radius:9px;padding:8px 10px;font-size:.85rem;min-width:0}
+.commit-card .node{width:14px;height:14px;border-radius:50%;border:3px solid var(--main);background:var(--surface);flex:none;margin-top:3px}
+.commit-card code{color:var(--main);font-weight:600}
+.commit-card small{display:block;color:var(--muted);font-size:.76rem}
+.pop{animation:pop .45s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.empty{font-size:.84rem;color:var(--muted);font-style:italic}
+
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.85rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* branch stepper */
+.svg-scroll{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
+.graph{display:block;width:100%;min-width:520px;height:auto}
+.gp{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:1 1;stroke-dashoffset:0;transition:stroke-dashoffset .75s ease,opacity .25s}
+.gp.off{stroke-dashoffset:1;opacity:0}
+.s-main{stroke:var(--main)} .s-feat{stroke:var(--feat)}
+.gc{fill:var(--surface);stroke-width:5;transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.3,1.6,.5,1) .25s,opacity .3s .25s}
+.gc.off{transform:scale(0);opacity:0;transition-delay:0s}
+.gdot{fill:var(--main);transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.3,1.6,.5,1) .4s,opacity .3s .4s}
+.gdot.off{transform:scale(0);opacity:0;transition-delay:0s}
+.tag{transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.tag.off{opacity:0}
+.tag rect,.tag path{stroke:none}
+.tag-main rect,.tag-main path{fill:var(--main)}
+.tag-feat rect,.tag-feat path{fill:var(--feat)}
+.tag text{font-family:var(--f-mono);font-size:13px;font-weight:600;fill:#fff}
+.graph .lane{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.step-cap{display:grid;gap:8px;min-height:6.4em}
+.step-cap .cmd-line{display:inline-block;justify-self:start;background:var(--code-bg);color:var(--code-fg);padding:6px 12px;border-radius:8px;font-size:.84rem}
+.step-cap .cmd-line::before{content:"$ ";color:var(--code-prompt)}
+.stepbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.dots{display:flex;gap:6px}
+.dots button{width:28px;height:28px;border-radius:50%;border:2px solid var(--rule);background:var(--surface);font-family:var(--f-mono);font-size:.72rem;color:var(--muted);cursor:pointer;padding:0}
+.dots button.on{border-color:var(--main);color:var(--main)}
+.dots button.cur{background:var(--main);color:#fff;border-color:var(--main)}
+
+.callout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start;background:var(--surface-2);border-radius:14px;padding:20px}
+@media (max-width:700px){.callout{grid-template-columns:1fr}}
+.callout > div{display:grid;gap:10px;min-width:0}
+
+/* code blocks */
+.code{position:relative;background:var(--code-bg);border-radius:10px;min-width:0}
+.code pre{margin:0;padding:14px 16px;padding-right:86px;color:var(--code-fg);font-family:var(--f-mono);font-size:.84rem;line-height:1.6;overflow-x:auto}
+.code .cm{color:var(--code-dim)} .code .hl{color:var(--code-warn)}
+.copy{position:absolute;top:8px;right:8px;font-family:var(--f-mono);font-size:.72rem;padding:5px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--code-fg);cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.14)}
+
+/* sync demo */
+.sync{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:8px;align-items:stretch}
+.side{background:var(--surface-2);border-radius:12px;padding:14px;display:grid;gap:12px;align-content:start;min-width:0;transition:box-shadow .3s}
+.side-head{display:flex;gap:10px;align-items:center}
+.side-head svg{width:40px;height:40px;flex:none}
+.side-head strong{display:block;font-family:var(--f-display);font-size:1rem;line-height:1.15}
+.side-head small{display:block;color:var(--muted);font-size:.78rem;font-family:var(--f-mono)}
+.stack{display:flex;flex-direction:column;gap:6px;min-height:150px}
+.cchip{display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:6px 8px;font-size:.8rem;min-width:0}
+.cchip b{font-family:var(--f-mono);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:.75rem;color:#fff;background:var(--muted)}
+.cchip.mine b{background:var(--main)} .cchip.theirs b{background:var(--feat)}
+.cchip span{min-width:0;overflow-wrap:anywhere}
+.cchip em{margin-left:auto;font-style:normal;font-family:var(--f-mono);font-size:.66rem;padding:2px 6px;border-radius:5px;background:var(--feat-soft);color:var(--ink);white-space:nowrap}
+.wire{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:24px;font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.wire div{display:grid;justify-items:center;gap:2px}
+.wire svg{width:44px;height:14px}
+.packet{position:absolute;left:0;top:0;pointer-events:none;background:var(--main);color:#fff;font-family:var(--f-mono);font-size:.75rem;font-weight:600;padding:6px 10px;border-radius:20px;box-shadow:var(--shadow);white-space:nowrap;z-index:3}
+.side.flash{box-shadow:0 0 0 3px var(--bad)}
+@media (max-width:520px){.sync{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr)}.wire span{display:none}.cchip span{font-size:.74rem}.side{padding:10px}.side-head svg{width:30px;height:30px}}
+
+/* fork svg */
+.fork-svg{display:block;width:100%;min-width:540px;height:auto}
+.fork-svg .box{fill:var(--surface);stroke:var(--rule);stroke-width:1.5}
+.fork-svg .box.you{stroke:var(--main);stroke-width:2}
+.fork-svg .zone{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 5}
+.fork-svg .t1{font-family:var(--f-display);font-size:16px;font-weight:700;fill:var(--ink)}
+.fork-svg .t2{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.fork-svg .lbl{font-family:var(--f-mono);font-size:12.5px;font-weight:600}
+.fork-svg .arr{fill:none;stroke-width:2.5}
+.flow{stroke-dasharray:7 6;animation:flow 1.1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-13}}
+
+/* PR demo */
+.pr-demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+@media (max-width:760px){.pr-demo{grid-template-columns:1fr}}
+.pr-steps{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.pr-steps button{all:unset;box-sizing:border-box;display:flex;gap:12px;align-items:flex-start;width:100%;padding:9px 10px;border-radius:10px;cursor:pointer}
+.pr-steps button:hover{background:var(--surface-2)}
+.pr-steps button:focus-visible{outline:3px solid var(--main)}
+.pr-steps .n{font-family:var(--f-mono);font-size:.78rem;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--rule);flex:none;color:var(--muted);background:var(--surface);transition:all .3s}
+.pr-steps strong{display:block;font-size:.95rem}
+.pr-steps small{display:block;font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.pr-steps li.done .n{border-color:var(--main);color:var(--main)}
+.pr-steps li.cur .n{background:var(--main);border-color:var(--main);color:#fff}
+.pr-steps li.cur button{background:var(--main-soft)}
+.pr-card{border:1px solid var(--rule);border-radius:14px;background:var(--surface);padding:18px;display:grid;gap:12px;transition:opacity .3s}
+.pr-card.local{opacity:.72}
+.pr-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{font-family:var(--f-mono);font-size:.74rem;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--surface-2);color:var(--muted);transition:background .3s,color .3s}
+.pill.open{background:var(--good-soft);color:var(--good)}
+.pill.merged{background:var(--main-soft);color:var(--main)}
+.pill.warn{background:var(--feat-soft);color:var(--feat)}
+.pr-num{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.pr-branch{font-size:.88rem;color:var(--muted)}
+.pr-feed{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--rule);display:grid;gap:10px}
+.pr-feed li{position:relative;font-size:.88rem;animation:termIn .35s ease both}
+.pr-feed li::before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--muted)}
+.pr-feed li.c::before{border-color:var(--main)}
+.pr-feed li.r::before{border-color:var(--feat)}
+.pr-feed li.ok::before{border-color:var(--good);background:var(--good)}
+.pr-feed .bubble{display:block;margin-top:4px;background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.merge-btn{font-family:var(--f-mono);font-size:.84rem;font-weight:600;padding:9px 14px;border-radius:9px;border:0;background:var(--surface-2);color:var(--muted)}
+.merge-btn.ready{background:var(--good);color:#fff}
+.merge-btn.did{background:var(--main);color:#fff}
+.pr-note{font-size:.82rem;color:var(--muted);font-style:italic}
+
+/* first repo steps */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:22px;counter-reset:st}
+.steps > li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;counter-increment:st}
+.steps > li::before{content:counter(st);font-family:var(--f-display);font-weight:800;font-size:1.3rem;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--main-soft);color:var(--main)}
+.steps .body{display:grid;gap:10px;min-width:0}
+
+.cheat td:first-child{font-weight:400}
+.cheat td code{white-space:nowrap;background:none;padding:0;font-weight:600;color:var(--main)}
+.cheat .grp td{background:var(--surface-2);font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding-block:7px}
+.mini-copy{font-family:var(--f-mono);font-size:.7rem;padding:3px 8px;border-radius:6px;border:1px solid var(--rule);background:var(--surface);color:var(--muted);cursor:pointer}
+.mini-copy:hover{color:var(--ink);border-color:var(--muted)}
+
+/* quiz */
+.quiz{display:grid;gap:16px}
+.q{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px;display:grid;gap:12px}
+.q h4{font-family:var(--f-body);font-size:1.02rem}
+.q .opts{display:grid;gap:8px}
+.q .opts button{all:unset;box-sizing:border-box;border:1.5px solid var(--rule);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:.95rem;transition:border-color .2s,background .2s}
+.q .opts button:hover{border-color:var(--main)}
+.q .opts button:focus-visible{outline:3px solid var(--main)}
+.q .opts button.right{border-color:var(--good);background:var(--good-soft)}
+.q .opts button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.q .opts button[disabled]{cursor:default}
+.q .why{font-size:.9rem;color:var(--muted)}
+.score{font-family:var(--f-mono);font-size:.9rem;color:var(--muted)}
+.score b{color:var(--ink)}
+
+.glossary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin:0}
+@media (max-width:700px){.glossary{grid-template-columns:1fr}}
+.glossary div{padding:12px 0;border-bottom:1px solid var(--rule);display:grid;gap:2px}
+.glossary dt{font-family:var(--f-mono);font-weight:600;color:var(--main);font-size:.92rem}
+.glossary dd{margin:0;font-size:.95rem}
+
+.links{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.links a{display:grid;gap:4px;padding:14px 16px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.links a:hover{border-color:var(--main)}
+.links a small{color:var(--muted);font-size:.84rem}
+.links a span{font-weight:700}
+
+/* hero animation */
+.h-line{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:1 1;animation:draw 1.2s cubic-bezier(.6,0,.3,1) both}
+.h-st{fill:var(--surface);stroke-width:5;transform-box:fill-box;transform-origin:center;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.h-lbl{font-family:var(--f-mono);font-size:13px;font-weight:600}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.25;r:12}50%{opacity:0;r:22}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="page">
+
+<header class="hero">
+  <div class="hero-text">
+    <p class="eyebrow"><span class="line"></span>Guia ilustrado para iniciantes</p>
+    <h1>GitHub do zero</h1>
+    <p class="lede">Entenda, com desenhos e animações que você pode controlar, como o Git guarda o histórico do seu projeto e como o GitHub ajuda pessoas a trabalharem juntas no mesmo código. Não precisa saber programar: basta saber o que é uma pasta e um arquivo.</p>
+  </div>
+  <figure class="hero-art">
+    <svg viewBox="0 0 560 220" role="img" aria-label="Mapa de commits: uma linha principal azul e duas branches, laranja e verde, que saem e voltam para ela">
+      <path class="h-line" pathLength="1" style="stroke:var(--main)" d="M24 120 L536 120"/>
+      <path class="h-line" pathLength="1" style="stroke:var(--feat);animation-delay:.5s" d="M110 120 C150 120 150 50 190 50 L320 50 C360 50 360 120 400 120"/>
+      <path class="h-line" pathLength="1" style="stroke:var(--fix);animation-delay:.8s" d="M250 120 C280 120 280 175 310 175 L380 175 C420 175 420 120 460 120"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:.3s" cx="40" cy="120" r="10"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:.4s" cx="110" cy="120" r="10"/>
+      <circle class="h-st" style="stroke:var(--feat);animation-delay:1.0s" cx="215" cy="50" r="10"/>
+      <circle class="h-st" style="stroke:var(--feat);animation-delay:1.1s" cx="295" cy="50" r="10"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:.7s" cx="250" cy="120" r="10"/>
+      <circle class="h-st" style="stroke:var(--fix);animation-delay:1.3s" cx="345" cy="175" r="10"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:1.5s" cx="400" cy="120" r="13"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:1.7s" cx="460" cy="120" r="13"/>
+      <circle class="h-st" style="stroke:var(--main);animation-delay:1.9s" cx="520" cy="120" r="10"/>
+      <circle class="pulse" cx="520" cy="120" r="12" style="fill:var(--main)"/>
+      <text class="h-lbl" x="24" y="152" style="fill:var(--main)">main</text>
+      <text class="h-lbl" x="190" y="28" style="fill:var(--feat)">nova-funcionalidade</text>
+      <text class="h-lbl" x="310" y="205" style="fill:var(--fix)">correcao-menu</text>
+      <text class="h-lbl" x="496" y="152" style="fill:var(--muted)">agora</text>
+    </svg>
+    <figcaption>Cada bolinha é um commit (uma versão salva). Cada linha colorida é uma branch. Ao longo do guia você vai montar esse desenho passo a passo.</figcaption>
+  </figure>
+</header>
+
+<nav class="roteiro" aria-label="Roteiro do guia">
+  <p class="eyebrow">Roteiro</p>
+  <ol>
+    <li><a href="#git-github">Git e GitHub</a></li>
+    <li><a href="#commit">Repositório e commit</a></li>
+    <li><a href="#branch">Branches e merge</a></li>
+    <li><a href="#remoto">Clone, push e pull</a></li>
+    <li><a href="#colaborar">Fork e Pull Request</a></li>
+    <li><a href="#primeiro">Seu primeiro repositório</a></li>
+    <li><a href="#comandos">Cola de comandos</a></li>
+    <li><a href="#teste">Teste rápido</a></li>
+    <li><a href="#glossario">Glossário</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="git-github">
+  <div class="sec-head">
+    <p class="eyebrow"><span class="line"></span>Parte 1</p>
+    <h2>Git e GitHub não são a mesma coisa</h2>
+    <div class="prose">
+      <p>Pense num jogo de videogame com <strong>pontos de salvamento</strong>. Você pode salvar antes de uma fase difícil e, se der errado, voltar ao ponto salvo. O <strong>Git</strong> faz isso com os arquivos de um projeto: guarda cada versão importante e deixa você voltar, comparar e entender o que mudou.</p>
+      <p>O <strong>GitHub</strong> é um site onde você coloca esse histórico na internet. Lá ele fica seguro, outras pessoas podem ver e colaborar, e existem ferramentas para revisar, discutir e organizar o trabalho.</p>
+    </div>
+  </div>
+
+  <div class="duo">
+    <div class="duo-card">
+      <svg viewBox="0 0 260 130" aria-hidden="true">
+        <rect x="40" y="12" width="180" height="96" rx="8" style="fill:var(--code-bg)"/>
+        <rect x="20" y="108" width="220" height="12" rx="4" style="fill:var(--rule)"/>
+        <text x="56" y="40" style="fill:var(--code-prompt);font-family:var(--f-mono);font-size:12px">$ git commit</text>
+        <path d="M60 78 L200 78" style="stroke:var(--main);stroke-width:5;stroke-linecap:round"/>
+        <circle cx="72" cy="78" r="7" style="fill:var(--code-bg);stroke:var(--main);stroke-width:4"/>
+        <circle cx="122" cy="78" r="7" style="fill:var(--code-bg);stroke:var(--main);stroke-width:4"/>
+        <circle cx="172" cy="78" r="7" style="fill:var(--code-bg);stroke:var(--main);stroke-width:4">
+          <animate attributeName="r" values="7;9;7" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <p class="tag-word">programa · roda no seu computador</p>
+      <h3>Git</h3>
+      <p>Ferramenta de <strong>controle de versões</strong>. Você instala no computador e usa pelo terminal ou por um aplicativo. Funciona sem internet.</p>
+    </div>
+    <div class="duo-card">
+      <svg viewBox="0 0 260 130" aria-hidden="true">
+        <path d="M70 92 a26 26 0 0 1 6-51 a36 36 0 0 1 68-10 a28 28 0 0 1 46 22 a22 22 0 0 1 0 39 z" style="fill:var(--main-soft);stroke:var(--main);stroke-width:2.5"/>
+        <rect x="104" y="54" width="52" height="30" rx="4" style="fill:var(--surface);stroke:var(--main);stroke-width:2"/>
+        <path d="M110 64 h28 M110 72 h40" style="stroke:var(--muted);stroke-width:2.5;stroke-linecap:round"/>
+        <circle cx="40" cy="112" r="9" style="fill:var(--feat)"/>
+        <circle cx="130" cy="118" r="9" style="fill:var(--fix)"/>
+        <circle cx="220" cy="112" r="9" style="fill:var(--main)"/>
+        <path d="M46 104 L100 86 M130 109 L130 86 M214 104 L160 86" style="stroke:var(--muted);stroke-width:1.6;stroke-dasharray:4 4" class="flow"/>
+      </svg>
+      <p class="tag-word">site · roda na nuvem</p>
+      <h3>GitHub</h3>
+      <p>Serviço que <strong>hospeda repositórios Git</strong> e adiciona colaboração: revisão de código, lista de tarefas (issues), páginas de projeto e automações.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Git</th><th>GitHub</th></tr></thead>
+      <tbody>
+        <tr><td>O que é</td><td>Programa de controle de versões</td><td>Site que guarda repositórios Git</td></tr>
+        <tr><td>Onde fica</td><td>No seu computador</td><td>Na internet</td></tr>
+        <tr><td>Precisa de internet?</td><td>Não</td><td>Sim</td></tr>
+        <tr><td>Origem</td><td>Criado por Linus Torvalds em 2005</td><td>Lançado em 2008, comprado pela Microsoft em 2018</td></tr>
+        <tr><td>Parecidos</td><td>Mercurial, SVN</td><td>GitLab, Bitbucket</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="commit">
+  <div class="sec-head">
+    <p class="eyebrow"><span class="line"></span>Parte 2</p>
+    <h2>Repositório e commit</h2>
+    <div class="prose">
+      <p>Um <strong>repositório</strong> (ou "repo") é a pasta do seu projeto junto com todo o histórico dela. O histórico fica numa pasta escondida chamada <code>.git</code>, que o Git cria e cuida sozinho.</p>
+      <p>Um <strong>commit</strong> é uma foto do projeto num momento. Cada commit guarda quem fez, quando, uma mensagem explicando a mudança e um código único chamado <em>hash</em>, como <code>a3f9c1e</code>.</p>
+      <p>Antes de virar commit, uma alteração passa por três lugares. Experimente abaixo: edite arquivos, prepare com <code>git add</code> e salve com <code>git commit</code>.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><h3>As três áreas do Git</h3><small>Clique nos botões para mover as alterações</small></div>
+    <div class="areas">
+      <div class="area">
+        <h4><span class="n">1</span>Pasta de trabalho</h4>
+        <p class="area-sub">Onde você edita os arquivos. As mudanças ainda não estão guardadas.</p>
+        <div class="drop" id="drop-work"></div>
+      </div>
+      <div class="area">
+        <h4><span class="n">2</span>Área de preparação</h4>
+        <p class="area-sub">Chamada de <em>staging</em>. Você escolhe o que vai entrar na próxima foto.</p>
+        <div class="drop" id="drop-stage"></div>
+      </div>
+      <div class="area">
+        <h4><span class="n">3</span>Repositório</h4>
+        <p class="area-sub">O histórico de commits, guardado na pasta <code>.git</code>.</p>
+        <div class="drop" id="drop-repo"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="b-edit" type="button">Editar um arquivo</button>
+      <button class="btn cmd" id="b-add" type="button">git add .</button>
+      <button class="btn cmd" id="b-commit" type="button">git commit -m "..."</button>
+      <button class="btn cmd" id="b-status" type="button">git status</button>
+      <button class="btn ghost" id="b-reset" type="button">Recomeçar</button>
+    </div>
+    <pre class="term" id="term-areas" aria-live="polite"></pre>
+    <div class="legend"><span><i style="background:var(--feat)"></i>alteração não preparada</span><span><i style="background:var(--fix)"></i>alteração preparada</span><span><i style="background:var(--main)"></i>commit salvo</span></div>
+  </div>
+
+  <div class="callout">
+    <div>
+      <h4>Mensagens de commit que ajudam</h4>
+      <p>Escreva o que a mudança faz, no imperativo, como se completasse a frase "este commit vai...". Daqui a seis meses, você vai agradecer.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Evite</th><th>Prefira</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:400"><code>mudanças</code></td><td><code>Corrige erro no envio do formulário</code></td></tr>
+          <tr><td style="font-weight:400"><code>asdf</code></td><td><code>Adiciona foto na página Sobre</code></td></tr>
+          <tr><td style="font-weight:400"><code>final2_agora_vai</code></td><td><code>Ajusta cores do menu no modo escuro</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="branch">
+  <div class="sec-head">
+    <p class="eyebrow feat"><span class="line"></span>Parte 3</p>
+    <h2>Branches: caminhos paralelos</h2>
+    <div class="prose">
+      <p>Uma <strong>branch</strong> (ramo) é uma linha de trabalho separada. Você cria uma branch para testar uma ideia sem mexer na versão principal, chamada <code>main</code>. Se der certo, faz o <strong>merge</strong> (junção) de volta. Se der errado, é só abandonar a branch.</p>
+      <p>Por dentro, uma branch é só uma etiqueta que aponta para um commit. Nada é copiado. Avance os passos e observe as etiquetas se moverem.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="svg-scroll">
+      <svg class="graph" viewBox="0 0 600 240" role="img" aria-label="Animação de branch e merge">
+        <text class="lane" x="566" y="169">main</text>
+        <path class="gp s-main" data-s="0" pathLength="1" d="M30 165 L150 165"/>
+        <path class="gp s-feat" data-s="2" pathLength="1" d="M150 165 C200 165 200 75 250 75"/>
+        <path class="gp s-feat" data-s="3" pathLength="1" d="M250 75 L340 75"/>
+        <path class="gp s-main" data-s="4" pathLength="1" d="M150 165 L290 165"/>
+        <path class="gp s-main" data-s="5" pathLength="1" d="M290 165 L450 165"/>
+        <path class="gp s-feat" data-s="5" pathLength="1" d="M340 75 C395 75 395 165 450 165"/>
+        <circle class="gc" data-s="0" cx="60" cy="165" r="12" style="stroke:var(--main)"/>
+        <circle class="gc" data-s="0" cx="150" cy="165" r="12" style="stroke:var(--main)"/>
+        <circle class="gc" data-s="2" cx="250" cy="75" r="12" style="stroke:var(--feat)"/>
+        <circle class="gc" data-s="3" cx="340" cy="75" r="12" style="stroke:var(--feat)"/>
+        <circle class="gc" data-s="4" cx="290" cy="165" r="12" style="stroke:var(--main)"/>
+        <circle class="gc" data-s="5" cx="450" cy="165" r="15" style="stroke:var(--main)"/>
+        <circle class="gdot" data-s="5" cx="450" cy="165" r="6"/>
+        <g class="tag tag-feat" id="tag-feat" style="transform:translate(150px,165px)">
+          <path d="M-6 -24 L0 -16 L6 -24 Z"/><rect x="-50" y="-48" width="100" height="24" rx="12"/><text x="0" y="-31.5" text-anchor="middle">nova-func</text>
+        </g>
+        <g class="tag tag-main" id="tag-main" style="transform:translate(150px,165px)">
+          <path d="M-6 24 L0 16 L6 24 Z"/><rect x="-30" y="24" width="60" height="24" rx="12"/><text x="0" y="40.5" text-anchor="middle">main</text>
+        </g>
+      </svg>
+    </div>
+    <div class="step-cap" aria-live="polite">
+      <code class="cmd-line" id="br-cmd"></code>
+      <p id="br-text"></p>
+    </div>
+    <div class="stepbar">
+      <div class="controls">
+        <button class="btn" id="br-prev" type="button">← Voltar</button>
+        <button class="btn primary" id="br-next" type="button">Próximo passo →</button>
+        <button class="btn ghost" id="br-play" type="button">Reproduzir tudo</button>
+      </div>
+      <div class="dots" id="br-dots" aria-label="Escolher passo"></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div>
+      <h4>E quando dá conflito?</h4>
+      <p>Se as duas branches mudaram <strong>a mesma linha</strong> do mesmo arquivo, o Git não sabe qual versão escolher e pede ajuda. Ele marca o trecho no arquivo assim. Você apaga as marcas, deixa a versão certa (ou combina as duas), salva e faz um novo commit.</p>
+      <p class="muted">Conflito não é erro grave. É só o Git perguntando "qual das duas?".</p>
+    </div>
+    <div class="code"><pre><code><span class="hl">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+&lt;h1&gt;Bem-vindo à loja&lt;/h1&gt;
+<span class="hl">=======</span>
+&lt;h1&gt;Boas-vindas à nossa loja&lt;/h1&gt;
+<span class="hl">&gt;&gt;&gt;&gt;&gt;&gt;&gt; nova-func</span>
+
+<span class="cm"># em cima: o que está na sua branch atual
+# embaixo: o que veio da outra branch</span></code></pre></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="remoto">
+  <div class="sec-head">
+    <p class="eyebrow fix"><span class="line"></span>Parte 4</p>
+    <h2>Local e remoto: clone, push e pull</h2>
+    <div class="prose">
+      <p>O repositório no seu computador é o <strong>local</strong>. O que está no GitHub é o <strong>remoto</strong>, que por costume se chama <code>origin</code>. Eles não se sincronizam sozinhos: você usa três comandos para trocar commits entre os dois.</p>
+      <p><code>git clone</code> baixa o projeto inteiro pela primeira vez. <code>git push</code> envia seus commits novos. <code>git pull</code> traz os commits que outras pessoas enviaram. Simule abaixo, incluindo o que acontece quando um colega envia algo antes de você.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="sync" id="sync">
+      <div class="side" id="side-local">
+        <div class="side-head">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="8" width="28" height="19" rx="2" style="fill:var(--code-bg)"/><rect x="2" y="28" width="36" height="4" rx="2" style="fill:var(--muted)"/><path d="M11 15 l4 3 l-4 3 M18 22 h8" style="fill:none;stroke:var(--code-prompt);stroke-width:2;stroke-linecap:round"/></svg>
+          <div><strong>Seu computador</strong><small>repositório local</small></div>
+        </div>
+        <div class="stack" id="stack-local"></div>
+      </div>
+      <div class="wire" aria-hidden="true">
+        <div><svg viewBox="0 0 44 14"><path d="M2 7 H38 M32 2 L40 7 L32 12" style="fill:none;stroke:var(--main);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"/></svg><span>push</span></div>
+        <div><svg viewBox="0 0 44 14"><path d="M42 7 H6 M12 2 L4 7 L12 12" style="fill:none;stroke:var(--fix);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"/></svg><span>pull</span></div>
+      </div>
+      <div class="side" id="side-remote">
+        <div class="side-head">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M11 30 a8 8 0 0 1 1-16 a10 10 0 0 1 18 2 a7 7 0 0 1 0 14 z" style="fill:var(--main-soft);stroke:var(--main);stroke-width:2"/></svg>
+          <div><strong>GitHub</strong><small>remoto · origin</small></div>
+        </div>
+        <div class="stack" id="stack-remote"></div>
+      </div>
+      <div class="packet" id="packet" hidden></div>
+    </div>
+    <div class="controls">
+      <button class="btn cmd" id="s-clone" type="button">git clone</button>
+      <button class="btn" id="s-commit" type="button">Fazer um commit</button>
+      <button class="btn cmd" id="s-push" type="button">git push</button>
+      <button class="btn" id="s-colleague" type="button">Colega envia commit</button>
+      <button class="btn cmd" id="s-pull" type="button">git pull</button>
+      <button class="btn ghost" id="s-reset" type="button">Recomeçar</button>
+    </div>
+    <pre class="term" id="term-sync" aria-live="polite"></pre>
+    <div class="legend"><span><i style="background:var(--main)"></i>commit seu</span><span><i style="background:var(--feat)"></i>commit de um colega</span><span><i style="background:var(--muted)"></i>commit que já existia</span></div>
+  </div>
+
+  <p class="prose muted">Dica: existe também o <code>git fetch</code>, que só baixa as novidades para você olhar, sem misturar com o seu trabalho. O <code>git pull</code> é um <code>fetch</code> seguido de um <code>merge</code>.</p>
+</section>
+
+<!-- 5 -->
+<section id="colaborar">
+  <div class="sec-head">
+    <p class="eyebrow"><span class="line"></span>Parte 5</p>
+    <h2>Fork e Pull Request: colaborar sem bagunçar</h2>
+    <div class="prose">
+      <p>Num projeto de outra pessoa, você não pode enviar commits direto. O caminho é fazer um <strong>fork</strong>, que cria uma cópia do repositório na sua conta do GitHub. Você trabalha na sua cópia e depois abre um <strong>Pull Request</strong> (PR): um pedido para o dono revisar e juntar suas mudanças ao projeto original.</p>
+      <p>Na sua equipe, quando todos têm acesso ao mesmo repositório, não precisa de fork: basta criar uma branch e abrir o PR a partir dela.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="svg-scroll">
+      <svg class="fork-svg" viewBox="0 0 640 240" role="img" aria-label="Fluxo: fork do projeto original para sua conta, clone para o computador, push de volta para o fork e Pull Request para o original">
+        <defs>
+          <marker id="ah-m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--main)"/></marker>
+          <marker id="ah-f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--feat)"/></marker>
+          <marker id="ah-x" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--fix)"/></marker>
+        </defs>
+        <rect class="zone" x="8" y="6" width="624" height="120" rx="14"/>
+        <text class="t2" x="320" y="26" text-anchor="middle">na nuvem · github.com</text>
+        <rect class="box" x="26" y="38" width="200" height="66" rx="10"/>
+        <text class="t1" x="42" y="66">Projeto original</text>
+        <text class="t2" x="42" y="88">fulano/loja-online</text>
+        <rect class="box you" x="414" y="38" width="200" height="66" rx="10"/>
+        <text class="t1" x="430" y="66">Seu fork</text>
+        <text class="t2" x="430" y="88">voce/loja-online</text>
+        <rect class="box you" x="414" y="166" width="200" height="60" rx="10"/>
+        <text class="t1" x="430" y="192">Seu computador</text>
+        <text class="t2" x="430" y="212">pasta loja-online/</text>
+        <path class="arr flow" d="M232 56 L406 56" style="stroke:var(--main)" marker-end="url(#ah-m)"/>
+        <text class="lbl" x="319" y="49" text-anchor="middle" style="fill:var(--main)">1 · fork</text>
+        <path class="arr flow" d="M476 110 L476 158" style="stroke:var(--main)" marker-end="url(#ah-m)"/>
+        <text class="lbl" x="466" y="140" text-anchor="end" style="fill:var(--main)">2 · clone</text>
+        <path class="arr flow" d="M552 160 L552 112" style="stroke:var(--fix)" marker-end="url(#ah-x)"/>
+        <text class="lbl" x="562" y="140" style="fill:var(--fix)">3 · push</text>
+        <path class="arr flow" d="M408 88 L234 88" style="stroke:var(--feat)" marker-end="url(#ah-f)"/>
+        <text class="lbl" x="321" y="108" text-anchor="middle" style="fill:var(--feat)">4 · Pull Request</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><h3>A vida de um Pull Request</h3><small>Clique em cada etapa ou use os botões</small></div>
+    <div class="pr-demo">
+      <ol class="pr-steps" id="pr-steps">
+        <li><button type="button" data-i="1"><span class="n">1</span><span><strong>Crie uma branch</strong><small>git switch -c nova-contato</small></span></button></li>
+        <li><button type="button" data-i="2"><span class="n">2</span><span><strong>Faça seus commits</strong><small>git add . &amp;&amp; git commit</small></span></button></li>
+        <li><button type="button" data-i="3"><span class="n">3</span><span><strong>Envie a branch</strong><small>git push origin nova-contato</small></span></button></li>
+        <li><button type="button" data-i="4"><span class="n">4</span><span><strong>Abra o Pull Request</strong><small>no site, botão "Compare &amp; pull request"</small></span></button></li>
+        <li><button type="button" data-i="5"><span class="n">5</span><span><strong>Revisão e ajustes</strong><small>comentários, novos commits, aprovação</small></span></button></li>
+        <li><button type="button" data-i="6"><span class="n">6</span><span><strong>Merge</strong><small>as mudanças entram na main</small></span></button></li>
+      </ol>
+      <div class="pr-card" id="pr-card">
+        <div class="pr-top"><span class="pill" id="pr-pill">Só no seu computador</span><span class="pr-num">#12</span></div>
+        <h4>Adiciona página de contato</h4>
+        <p class="pr-branch"><code>nova-contato</code> → <code>main</code></p>
+        <ul class="pr-feed" id="pr-feed"></ul>
+        <p class="pr-note" id="pr-note"></p>
+        <div><span class="merge-btn" id="pr-merge">Fazer merge</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="pr-prev" type="button">← Voltar</button>
+      <button class="btn primary" id="pr-next" type="button">Próxima etapa →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="primeiro">
+  <div class="sec-head">
+    <p class="eyebrow fix"><span class="line"></span>Parte 6</p>
+    <h2>Seu primeiro repositório, passo a passo</h2>
+    <p class="prose muted">Abra o terminal (no Windows, o Git Bash que vem com o Git). Os comandos com <code>seu-usuario</code> e <code>meu-projeto</code> precisam dos seus próprios nomes.</p>
+  </div>
+  <ol class="steps">
+    <li><div class="body">
+      <h3>Instale o Git e crie sua conta</h3>
+      <p>Baixe o Git em <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a> e crie uma conta gratuita em <a href="https://github.com/signup" target="_blank" rel="noopener">github.com</a>. Depois confira a instalação:</p>
+      <div class="code"><pre><code>git --version</code></pre><button class="copy" type="button">Copiar</button></div>
+    </div></li>
+    <li><div class="body">
+      <h3>Diga ao Git quem é você</h3>
+      <p>Faça isso uma vez só. Esse nome e e-mail aparecem em todos os seus commits.</p>
+      <div class="code"><pre><code>git config --global user.name "Seu Nome"
+git config --global user.email "voce@exemplo.com"</code></pre><button class="copy" type="button">Copiar</button></div>
+    </div></li>
+    <li><div class="body">
+      <h3>Crie o repositório no GitHub</h3>
+      <p>No site, clique em <strong>New</strong> (ou no <strong>+</strong> no canto superior), dê um nome como <code>meu-projeto</code> e clique em <strong>Create repository</strong>. Deixe sem README para este exemplo.</p>
+    </div></li>
+    <li><div class="body">
+      <h3>Transforme sua pasta em repositório e faça o primeiro commit</h3>
+      <div class="code"><pre><code>cd caminho/da/pasta/meu-projeto
+git init
+git add .
+git commit -m "Primeiro commit"</code></pre><button class="copy" type="button">Copiar</button></div>
+    </div></li>
+    <li><div class="body">
+      <h3>Conecte ao GitHub</h3>
+      <div class="code"><pre><code>git branch -M main
+git remote add origin https://github.com/seu-usuario/meu-projeto.git</code></pre><button class="copy" type="button">Copiar</button></div>
+    </div></li>
+    <li><div class="body">
+      <h3>Envie</h3>
+      <div class="code"><pre><code>git push -u origin main</code></pre><button class="copy" type="button">Copiar</button></div>
+      <p class="muted">O GitHub não aceita a senha da conta no terminal. Na primeira vez, entre pela janela do navegador que se abre, ou use um <em>token de acesso pessoal</em>, ou o GitHub CLI (<code>gh auth login</code>). Atualize a página do repositório e seus arquivos estarão lá.</p>
+    </div></li>
+  </ol>
+  <p class="prose">Prefere não usar o terminal? O <a href="https://desktop.github.com" target="_blank" rel="noopener">GitHub Desktop</a> faz tudo isso com botões, e o VS Code tem uma aba de controle de versões integrada. Os conceitos deste guia valem para qualquer um deles.</p>
+</section>
+
+<!-- 7 -->
+<section id="comandos">
+  <div class="sec-head">
+    <p class="eyebrow"><span class="line"></span>Parte 7</p>
+    <h2>Cola de comandos</h2>
+    <p class="prose muted">Os comandos que resolvem 90% do dia a dia. Na dúvida, rode <code>git status</code>: ele sempre diz em que situação você está e sugere o próximo passo.</p>
+  </div>
+  <div class="table-wrap">
+    <table class="cheat">
+      <thead><tr><th>Comando</th><th>Para que serve</th><th></th></tr></thead>
+      <tbody id="cheat-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="teste">
+  <div class="sec-head">
+    <p class="eyebrow feat"><span class="line"></span>Parte 8</p>
+    <h2>Teste rápido</h2>
+    <p class="score" id="score">Acertos: <b>0</b> de 5</p>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<section id="glossario">
+  <div class="sec-head">
+    <p class="eyebrow"><span class="line"></span>Consulta</p>
+    <h2>Glossário</h2>
+  </div>
+  <dl class="glossary">
+    <div><dt>Branch</dt><dd>Linha de trabalho paralela. Uma etiqueta que aponta para um commit.</dd></div>
+    <div><dt>Clone</dt><dd>Cópia completa de um repositório remoto no seu computador.</dd></div>
+    <div><dt>Commit</dt><dd>Uma versão salva do projeto, com autor, data, mensagem e hash.</dd></div>
+    <div><dt>Conflito</dt><dd>Quando duas mudanças alteram a mesma linha e o Git pede para você escolher.</dd></div>
+    <div><dt>Fork</dt><dd>Cópia de um repositório de outra pessoa na sua conta do GitHub.</dd></div>
+    <div><dt>.gitignore</dt><dd>Arquivo que lista o que o Git deve ignorar, como senhas e arquivos temporários.</dd></div>
+    <div><dt>HEAD</dt><dd>Indica onde você está agora: a branch e o commit atuais.</dd></div>
+    <div><dt>Issue</dt><dd>Tarefa, bug ou sugestão registrada na aba Issues do repositório.</dd></div>
+    <div><dt>main</dt><dd>Nome padrão da branch principal. Em projetos antigos pode se chamar master.</dd></div>
+    <div><dt>Merge</dt><dd>Junção do histórico de uma branch em outra.</dd></div>
+    <div><dt>origin</dt><dd>Apelido padrão do repositório remoto de onde você clonou.</dd></div>
+    <div><dt>Pull</dt><dd>Trazer para o local os commits novos do remoto.</dd></div>
+    <div><dt>Pull Request (PR)</dt><dd>Pedido para revisar e juntar as mudanças de uma branch em outra.</dd></div>
+    <div><dt>Push</dt><dd>Enviar seus commits locais para o remoto.</dd></div>
+    <div><dt>README</dt><dd>Arquivo de apresentação do projeto, exibido na página inicial do repositório.</dd></div>
+    <div><dt>Staging</dt><dd>Área de preparação: o que entra no próximo commit.</dd></div>
+  </dl>
+</section>
+
+<section id="continuar">
+  <div class="sec-head">
+    <p class="eyebrow fix"><span class="line"></span>Para continuar</p>
+    <h2>Próximos passos</h2>
+  </div>
+  <div class="links">
+    <a href="https://learngitbranching.js.org/?locale=pt_BR" target="_blank" rel="noopener"><span>Learn Git Branching</span><small>Jogo interativo em português para treinar branches e merges.</small></a>
+    <a href="https://skills.github.com" target="_blank" rel="noopener"><span>GitHub Skills</span><small>Cursos práticos gratuitos feitos dentro do próprio GitHub.</small></a>
+    <a href="https://docs.github.com/pt/get-started" target="_blank" rel="noopener"><span>Documentação do GitHub</span><small>Guia oficial de primeiros passos, em português.</small></a>
+    <a href="https://git-scm.com/book/pt-br/v2" target="_blank" rel="noopener"><span>Livro Pro Git</span><small>Referência completa e gratuita sobre o Git, em português.</small></a>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const hex = () => Math.floor(Math.random()*0xfffffff).toString(16).padStart(7,'0');
+
+function term(el, cmd, outs, max){
+  max = max || 8;
+  const add = (html) => { const d=document.createElement('div'); d.className='term-line'; d.innerHTML=html; el.appendChild(d); };
+  if (cmd) add('<span class="p">$</span> ' + esc(cmd));
+  (outs||[]).forEach(o => add(typeof o === 'string' ? '<span class="o">'+esc(o)+'</span>' : '<span class="'+o.c+'">'+esc(o.t)+'</span>'));
+  while (el.children.length > max) el.removeChild(el.firstChild);
+}
+
+/* ---------- Áreas ---------- */
+const work=$('drop-work'), stage=$('drop-stage'), repo=$('drop-repo'), tA=$('term-areas');
+const files=['index.html','estilo.css','script.js','README.md','logo.png','contato.html'];
+const msgs=['Cria página inicial','Ajusta cores do menu','Adiciona script do carrossel','Atualiza o README','Troca o logo','Cria página de contato'];
+let fi=0, mi=0;
+function chip(name){ const c=document.createElement('span'); c.className='chip pop'; c.dataset.name=name; c.innerHTML='<span class="dot"></span>'+esc(name); return c; }
+function commitCard(h,msg,n,anim){ const d=document.createElement('div'); d.className='commit-card'+(anim?' pop':''); d.innerHTML='<span class="node"></span><div><code>'+h+'</code> '+esc(msg)+'<small>'+n+(n===1?' arquivo':' arquivos')+'</small></div>'; return d; }
+function emptyCheck(){
+  [[work,'Nenhuma alteração. Clique em "Editar um arquivo".'],[stage,'Vazia. Use git add para preparar.']].forEach(([el,t])=>{
+    const e=el.querySelector('.empty'); const has=el.querySelector('.chip');
+    if(!has && !e){ const p=document.createElement('p'); p.className='empty'; p.textContent=t; el.appendChild(p); }
+    if(has && e) e.remove();
+  });
+}
+function flip(els, target, cls){
+  const first=els.map(e=>e.getBoundingClientRect());
+  els.forEach(e=>{ e.classList.remove('pop'); if(cls) e.classList.add(cls); target.appendChild(e); });
+  emptyCheck();
+  if(reduce) return;
+  els.forEach((e,i)=>{ const last=e.getBoundingClientRect(); const dx=first[i].left-last.left, dy=first[i].top-last.top;
+    e.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:600,easing:'cubic-bezier(.2,.8,.2,1)',delay:i*60,fill:'backwards'}); });
+}
+function editFile(){
+  const present=new Set([...document.querySelectorAll('#drop-work .chip,#drop-stage .chip')].map(c=>c.dataset.name));
+  let name=null; for(let k=0;k<files.length;k++){ const n=files[(fi+k)%files.length]; if(!present.has(n)){ name=n; fi=(fi+k+1)%files.length; break; } }
+  if(!name){ term(tA,null,[{c:'w',t:'# todos os arquivos já foram editados. Faça git add e commit!'}]); return; }
+  work.appendChild(chip(name)); emptyCheck();
+  term(tA,null,[{c:'o',t:'# você salvou alterações em '+name}]);
+}
+function gitAdd(){
+  const cs=[...work.querySelectorAll('.chip')];
+  if(!cs.length){ term(tA,'git add .',['(nada mudou: não há o que preparar)']); return; }
+  flip(cs, stage, 'staged');
+  term(tA,'git add .',[ 'preparado: '+cs.map(c=>c.dataset.name).join(', ') ]);
+}
+function gitCommit(){
+  const cs=[...stage.querySelectorAll('.chip')];
+  const m=msgs[mi%msgs.length];
+  if(!cs.length){ term(tA,'git commit -m "'+m+'"',[{c:'w',t:'nothing to commit (nada preparado: use git add primeiro)'}]); return; }
+  mi++;
+  const h=hex(), n=cs.length;
+  const finish=()=>{ cs.forEach(c=>c.remove()); emptyCheck(); repo.prepend(commitCard(h,m,n,true)); };
+  if(reduce) finish(); else {
+    const r=repo.getBoundingClientRect();
+    let done=0;
+    cs.forEach((c,i)=>{ const b=c.getBoundingClientRect(); const a=c.animate([{transform:'none',opacity:1},{transform:`translate(${r.left+20-b.left}px,${r.top+20-b.top}px) scale(.3)`,opacity:0}],{duration:550,easing:'cubic-bezier(.5,0,.3,1)',delay:i*70,fill:'forwards'});
+      a.onfinish=()=>{ if(++done===cs.length) finish(); }; });
+  }
+  term(tA,'git commit -m "'+m+'"',[ '['+'main '+h+'] '+m, ' '+n+(n===1?' file changed':' files changed') ]);
+}
+function gitStatus(){
+  const w=[...work.querySelectorAll('.chip')].map(c=>c.dataset.name), s=[...stage.querySelectorAll('.chip')].map(c=>c.dataset.name);
+  const out=['On branch main'];
+  if(s.length) out.push({c:'o',t:'Preparado para commit: '+s.join(', ')});
+  if(w.length) out.push({c:'w',t:'Modificado, não preparado: '+w.join(', ')});
+  if(!s.length && !w.length) out.push('nothing to commit, working tree clean (tudo salvo)');
+  term(tA,'git status',out);
+}
+function resetAreas(){
+  work.innerHTML=''; stage.innerHTML=''; repo.innerHTML=''; tA.innerHTML=''; fi=2; mi=0;
+  repo.appendChild(commitCard('e1b04f2','Primeiro commit',3,false));
+  ['index.html','estilo.css'].forEach(n=>{ const c=chip(n); c.classList.remove('pop'); work.appendChild(c); });
+  emptyCheck();
+  term(tA,null,[{c:'o',t:'# você editou index.html e estilo.css. Experimente git status.'}]);
+}
+$('b-edit').onclick=editFile; $('b-add').onclick=gitAdd; $('b-commit').onclick=gitCommit; $('b-status').onclick=gitStatus; $('b-reset').onclick=resetAreas;
+resetAreas();
+
+/* ---------- Branch stepper ---------- */
+const steps=[
+  {cmd:'git log --oneline', text:'Este é o histórico da main: dois commits em sequência. A etiqueta azul "main" aponta para o commit mais recente.', main:[150,165], feat:null},
+  {cmd:'git switch -c nova-func', text:'Criamos a branch "nova-func". Repare: nenhum arquivo foi copiado. Surgiu apenas uma nova etiqueta apontando para o mesmo commit.', main:[150,165], feat:[150,165]},
+  {cmd:'git commit -m "Adiciona botão de compra"', text:'Um commit feito na branch nova-func. A etiqueta dela avança; a main continua parada onde estava.', main:[150,165], feat:[250,75]},
+  {cmd:'git commit -m "Estiliza o botão"', text:'Mais um commit na branch. Você pode trabalhar aqui à vontade sem afetar a versão principal.', main:[150,165], feat:[340,75]},
+  {cmd:'git switch main  &&  git commit -m "Corrige rodapé"', text:'Enquanto isso, a main também andou: alguém voltou para ela e fez uma correção. Agora as duas linhas seguem caminhos diferentes.', main:[290,165], feat:[340,75]},
+  {cmd:'git merge nova-func', text:'O merge junta as duas histórias. O Git cria um commit de merge (o círculo maior) que contém o trabalho das duas linhas. Pronto: a main tem o botão novo e a correção.', main:[450,165], feat:[340,75]}
+];
+let cur=0, playT=null;
+const gEls=[...document.querySelectorAll('.graph [data-s]')], tagM=$('tag-main'), tagF=$('tag-feat'), dots=$('br-dots');
+steps.forEach((s,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=i+1; b.setAttribute('aria-label','Passo '+(i+1)); b.onclick=()=>{stopPlay(); go(i);}; dots.appendChild(b); });
+function go(i){
+  cur=Math.max(0,Math.min(steps.length-1,i));
+  const s=steps[cur];
+  gEls.forEach(el=>el.classList.toggle('off', +el.dataset.s>cur));
+  tagM.style.transform=`translate(${s.main[0]}px,${s.main[1]}px)`;
+  if(s.feat){ tagF.classList.remove('off'); tagF.style.transform=`translate(${s.feat[0]}px,${s.feat[1]}px)`; } else tagF.classList.add('off');
+  $('br-cmd').textContent=s.cmd; $('br-text').textContent=s.text;
+  [...dots.children].forEach((b,k)=>{ b.classList.toggle('on',k<cur); b.classList.toggle('cur',k===cur); });
+  $('br-prev').disabled=cur===0; $('br-next').disabled=cur===steps.length-1;
+}
+function stopPlay(){ if(playT){ clearInterval(playT); playT=null; $('br-play').textContent='Reproduzir tudo'; } }
+$('br-prev').onclick=()=>{stopPlay(); go(cur-1);};
+$('br-next').onclick=()=>{stopPlay(); go(cur+1);};
+$('br-play').onclick=()=>{
+  if(playT){ stopPlay(); return; }
+  go(0); $('br-play').textContent='Pausar';
+  playT=setInterval(()=>{ if(cur>=steps.length-1){ stopPlay(); return; } go(cur+1); }, 2600);
+};
+go(0);
+
+/* ---------- Sync ---------- */
+const syncEl=$('sync'), packet=$('packet'), tS=$('term-sync'), sideL=$('side-local'), sideR=$('side-remote');
+const S={remote:[], local:null, n:0, busy:false};
+const mineMsgs=['Cria página inicial','Ajusta o menu','Adiciona rodapé','Corrige link quebrado','Melhora o título'];
+const theirMsgs=['Atualiza o README','Corrige erro de digitação','Troca imagens','Adiciona página de preços'];
+let mmi=0, tmi=0;
+function mk(owner,label){ const letter=String.fromCharCode(65+(S.n%26)); S.n++; return {id:S.n, l:letter, owner, label}; }
+function idset(a){ return new Set((a||[]).map(c=>c.id)); }
+function renderSync(popIds){
+  popIds=popIds||new Set();
+  const rset=idset(S.remote), lset=idset(S.local);
+  const build=(arr,el,other,badge)=>{
+    el.innerHTML='';
+    if(!arr){ el.innerHTML='<p class="empty">Ainda não há cópia aqui. Clique em git clone.</p>'; return; }
+    [...arr].reverse().forEach(c=>{
+      const d=document.createElement('div'); d.className='cchip '+c.owner+(popIds.has(c.id)?' pop':'');
+      const extra = (S.local && !other.has(c.id)) ? '<em>'+badge+'</em>' : '';
+      d.innerHTML='<b>'+c.l+'</b><span>'+esc(c.label)+'</span>'+extra; el.appendChild(d);
+    });
+  };
+  build(S.local,$('stack-local'),rset,'não enviado');
+  build(S.remote,$('stack-remote'),lset,'novo');
+}
+function fly(from,to,label,cb){
+  if(reduce){ cb(); return; }
+  S.busy=true;
+  const box=syncEl.getBoundingClientRect(), a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
+  const x1=a.left+a.width/2-box.left, y1=a.top+40-box.top, x2=b.left+b.width/2-box.left, y2=b.top+40-box.top;
+  packet.textContent=label; packet.hidden=false;
+  const anim=packet.animate([
+    {transform:`translate(${x1}px,${y1}px) translate(-50%,-50%) scale(.5)`,opacity:0},
+    {transform:`translate(${(x1+x2)/2}px,${Math.min(y1,y2)-46}px) translate(-50%,-50%) scale(1)`,opacity:1,offset:.5},
+    {transform:`translate(${x2}px,${y2}px) translate(-50%,-50%) scale(.6)`,opacity:.2}
+  ],{duration:1000,easing:'ease-in-out'});
+  anim.onfinish=()=>{ packet.hidden=true; S.busy=false; cb(); };
+}
+function flash(el){ el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),900); }
+const plural=(n)=>n+(n===1?' commit':' commits');
+$('s-clone').onclick=()=>{ if(S.busy) return;
+  if(S.local){ term(tS,'git clone https://github.com/equipe/site.git',[{c:'w',t:'fatal: a pasta "site" já existe. Você já tem a cópia; use git pull para atualizar.'}],7); return; }
+  fly(sideR,sideL,'baixando '+plural(S.remote.length),()=>{ S.local=S.remote.slice(); renderSync(idset(S.local));
+    term(tS,'git clone https://github.com/equipe/site.git',['Cloning into "site"... done.','Você agora tem uma cópia completa, com todo o histórico.'],7); });
+};
+$('s-commit').onclick=()=>{ if(S.busy) return;
+  if(!S.local){ term(tS,null,[{c:'w',t:'# Primeiro faça git clone para ter o projeto no computador.'}],7); flash(sideL); return; }
+  const c=mk('mine',mineMsgs[mmi++%mineMsgs.length]); S.local.push(c); renderSync(new Set([c.id]));
+  term(tS,'git commit -m "'+c.label+'"',['Commit '+c.l+' salvo só no seu computador. O GitHub ainda não sabe dele.'],7);
+};
+$('s-colleague').onclick=()=>{ if(S.busy) return;
+  const c=mk('theirs',theirMsgs[tmi++%theirMsgs.length]); S.remote.push(c); renderSync(new Set([c.id]));
+  term(tS,null,[{c:'o',t:'# Ana fez push do commit '+c.l+' ("'+c.label+'") para o GitHub.'}],7);
+};
+$('s-push').onclick=()=>{ if(S.busy) return;
+  if(!S.local){ term(tS,'git push',[{c:'w',t:'fatal: not a git repository (clone primeiro)'}],7); return; }
+  const rset=idset(S.remote), lset=idset(S.local);
+  const ahead=S.local.filter(c=>!rset.has(c.id)), behind=S.remote.filter(c=>!lset.has(c.id));
+  if(behind.length){ flash(sideR); term(tS,'git push',[{c:'w',t:'! [rejected] main -> main (fetch first)'},{c:'w',t:'Recusado: o GitHub tem '+plural(behind.length)+' que você ainda não tem. Faça git pull antes.'}],7); return; }
+  if(!ahead.length){ term(tS,'git push',['Everything up-to-date (não há nada novo para enviar)'],7); return; }
+  fly(sideL,sideR,'enviando '+plural(ahead.length),()=>{ S.remote=S.local.slice(); renderSync(idset(ahead));
+    term(tS,'git push',['To https://github.com/equipe/site.git','   main -> main: '+plural(ahead.length)+' enviado(s).'],7); });
+};
+$('s-pull').onclick=()=>{ if(S.busy) return;
+  if(!S.local){ term(tS,'git pull',[{c:'w',t:'fatal: not a git repository (clone primeiro)'}],7); return; }
+  const rset=idset(S.remote), lset=idset(S.local);
+  const behind=S.remote.filter(c=>!lset.has(c.id)), ahead=S.local.filter(c=>!rset.has(c.id));
+  if(!behind.length){ term(tS,'git pull',['Already up to date. (você já tem tudo)'],7); return; }
+  fly(sideR,sideL,'baixando '+plural(behind.length),()=>{ S.local=S.remote.concat(ahead); renderSync(idset(behind));
+    const out=['Recebido(s) '+plural(behind.length)+' do GitHub.'];
+    if(ahead.length) out.push({c:'o',t:'O Git juntou com seus '+plural(ahead.length)+' locais (merge). Agora o push vai funcionar.'});
+    term(tS,'git pull',out,7); });
+};
+function resetSync(){
+  S.n=0; mmi=0; tmi=0; S.busy=false; packet.hidden=true;
+  S.remote=[mk('base','Primeiro commit'), mk('base','Adiciona README')]; S.local=null;
+  tS.innerHTML=''; renderSync();
+  term(tS,null,[{c:'o',t:'# O projeto está no GitHub. Comece com git clone.'}],7);
+}
+$('s-reset').onclick=resetSync;
+resetSync();
+
+/* ---------- PR ---------- */
+const prFeed=[
+  {from:2, cls:'c', html:'2 commits: <code>Cria contato.html</code>, <code>Adiciona formulário</code>'},
+  {from:3, cls:'c', html:'Branch <code>nova-contato</code> enviada ao GitHub'},
+  {from:4, cls:'', html:'Você abriu este Pull Request com uma descrição do que mudou'},
+  {from:5, cls:'r', html:'<strong>Ana</strong> comentou<span class="bubble">Ficou ótimo! Só falta validar o campo de e-mail.</span>'},
+  {from:5, cls:'c', html:'Você fez o commit <code>Valida e-mail</code> e ele entrou no PR automaticamente'},
+  {from:5, cls:'ok', html:'<strong>Ana</strong> aprovou as mudanças'},
+  {from:6, cls:'ok', html:'Mesclado em <code>main</code>. A branch pode ser apagada.'}
+];
+const pills={1:['Só no seu computador',''],2:['Só no seu computador',''],3:['Branch no GitHub','warn'],4:['Aberto','open'],5:['Aprovado','open'],6:['Mesclado','merged']};
+const notes={1:'O Pull Request ainda não existe: primeiro você trabalha numa branch.',2:'Os commits estão salvos só no seu computador.',3:'O GitHub já tem sua branch e mostra um aviso sugerindo abrir o PR.',4:'Agora a equipe consegue ver as mudanças, linha por linha, na aba "Files changed".',5:'Revisar é conversar. Ajustes viram novos commits na mesma branch.',6:'Pronto! Sua contribuição faz parte do projeto.'};
+let pr=1, shownFeed=0;
+function goPR(i){
+  pr=Math.max(1,Math.min(6,i));
+  const feed=$('pr-feed'); const items=prFeed.filter(f=>f.from<=pr);
+  if(items.length<shownFeed || shownFeed===0){ feed.innerHTML=''; shownFeed=0; }
+  items.slice(shownFeed).forEach(f=>{ const li=document.createElement('li'); li.className=f.cls; li.innerHTML=f.html; feed.appendChild(li); });
+  shownFeed=items.length;
+  const p=$('pr-pill'); p.textContent=pills[pr][0]; p.className='pill '+pills[pr][1];
+  $('pr-card').classList.toggle('local',pr<3);
+  $('pr-note').textContent=notes[pr];
+  const m=$('pr-merge'); m.className='merge-btn'+(pr===5?' ready':'')+(pr===6?' did':''); m.textContent=pr===6?'Merge concluído':'Fazer merge';
+  [...$('pr-steps').children].forEach((li,k)=>{ li.classList.toggle('done',k+1<pr); li.classList.toggle('cur',k+1===pr); });
+  $('pr-prev').disabled=pr===1; $('pr-next').disabled=pr===6;
+}
+$('pr-steps').addEventListener('click',e=>{ const b=e.target.closest('button[data-i]'); if(b) goPR(+b.dataset.i); });
+$('pr-prev').onclick=()=>goPR(pr-1); $('pr-next').onclick=()=>goPR(pr+1);
+goPR(1);
+
+/* ---------- Copiar ---------- */
+function copyText(btn,text,orig){
+  const ok=()=>{ btn.textContent='Copiado'; setTimeout(()=>btn.textContent=orig,1400); };
+  try{ navigator.clipboard.writeText(text).then(ok).catch(()=>{ selectNear(btn); btn.textContent='Ctrl+C'; setTimeout(()=>btn.textContent=orig,1600); }); }
+  catch(e){ selectNear(btn); }
+}
+function selectNear(btn){ const t=btn.parentElement.querySelector('pre,code'); if(!t) return; const r=document.createRange(); r.selectNodeContents(t); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+document.querySelectorAll('.code .copy').forEach(b=>b.addEventListener('click',()=>copyText(b,b.parentElement.querySelector('pre').innerText.trim(),'Copiar')));
+
+/* ---------- Cola ---------- */
+const cheat=[
+  ['Configurar',[['git config --global user.name "Seu Nome"','Define seu nome nos commits'],['git config --global user.email "voce@exemplo.com"','Define seu e-mail nos commits']]],
+  ['Começar',[['git init','Transforma a pasta atual em repositório'],['git clone <url>','Baixa um repositório do GitHub']]],
+  ['Dia a dia',[['git status','Mostra o que mudou e o que está preparado'],['git add <arquivo>','Prepara um arquivo para o commit'],['git add .','Prepara todas as alterações'],['git commit -m "mensagem"','Salva uma versão com mensagem'],['git log --oneline','Lista o histórico de commits, um por linha'],['git diff','Mostra as linhas alteradas e ainda não preparadas']]],
+  ['Branches',[['git branch','Lista as branches'],['git switch -c <nome>','Cria uma branch e muda para ela'],['git switch <nome>','Muda para outra branch'],['git merge <nome>','Junta a branch indicada na atual']]],
+  ['GitHub',[['git remote add origin <url>','Liga o repositório local ao GitHub'],['git push -u origin main','Primeiro envio da branch main'],['git push','Envia seus commits'],['git pull','Traz os commits novos do GitHub']]],
+  ['Desfazer',[['git restore <arquivo>','Descarta alterações não salvas num arquivo'],['git restore --staged <arquivo>','Tira um arquivo da área de preparação']]]
+];
+const cb=$('cheat-body');
+cheat.forEach(([g,rows])=>{
+  const tr=document.createElement('tr'); tr.className='grp'; tr.innerHTML='<td colspan="3">'+g+'</td>'; cb.appendChild(tr);
+  rows.forEach(([c,d])=>{ const r=document.createElement('tr'); r.innerHTML='<td><code>'+esc(c)+'</code></td><td>'+esc(d)+'</td><td><button class="mini-copy" type="button">Copiar</button></td>';
+    const b=r.querySelector('button'); b.addEventListener('click',()=>copyText(b,c,'Copiar')); cb.appendChild(r); });
+});
+
+/* ---------- Quiz ---------- */
+const Q=[
+  {q:'Qual a diferença entre Git e GitHub?', o:['São dois nomes para a mesma coisa','Git é o programa de controle de versões; GitHub é um site que hospeda repositórios Git','GitHub é a versão paga do Git'], a:1, w:'O Git roda no seu computador, mesmo sem internet. O GitHub é um serviço online que guarda repositórios Git e facilita a colaboração.'},
+  {q:'O que o comando git add faz?', o:['Envia os arquivos para o GitHub','Coloca as alterações na área de preparação para o próximo commit','Cria um repositório novo'], a:1, w:'O git add só prepara. Quem salva a versão é o git commit, e quem envia ao GitHub é o git push.'},
+  {q:'Você quer testar uma ideia sem mexer na versão principal. O que faz?', o:['Cria uma branch','Apaga a main e começa de novo','Copia a pasta inteira com outro nome'], a:0, w:'Uma branch é uma linha paralela de trabalho. Se a ideia der certo, você faz merge; se não, abandona a branch.'},
+  {q:'Seu git push foi recusado porque o GitHub tem commits que você não tem. E agora?', o:['Apagar o repositório remoto','Fazer git pull, resolver qualquer conflito e tentar o push de novo','Esperar algumas horas'], a:1, w:'O pull traz e junta os commits dos colegas. Depois disso o seu push é aceito.'},
+  {q:'Para propor mudanças num projeto de outra pessoa, o caminho comum é:', o:['Pedir a senha do dono do projeto','Fork, commits na sua cópia e um Pull Request','Fazer git merge direto no repositório dela'], a:1, w:'O fork cria sua cópia, e o Pull Request pede para o dono revisar e aceitar suas mudanças.'}
+];
+let score=0;
+const qz=$('quiz');
+Q.forEach((it,qi)=>{
+  const d=document.createElement('div'); d.className='q';
+  d.innerHTML='<h4>'+(qi+1)+'. '+esc(it.q)+'</h4><div class="opts"></div><p class="why" hidden></p>';
+  const opts=d.querySelector('.opts'), why=d.querySelector('.why');
+  it.o.forEach((t,oi)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=t;
+    b.onclick=()=>{ const all=[...opts.children]; all.forEach(x=>x.disabled=true);
+      all[it.a].classList.add('right');
+      if(oi===it.a){ score++; why.textContent='Isso mesmo. '+it.w; } else { b.classList.add('wrong'); why.textContent='Não exatamente. '+it.w; }
+      why.hidden=false; $('score').innerHTML='Acertos: <b>'+score+'</b> de '+Q.length; };
+    opts.appendChild(b); });
+  qz.appendChild(d);
+});
+})();
+</script>
+
+</body></html>

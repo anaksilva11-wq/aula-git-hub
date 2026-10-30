@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flask, do Zero — Um Curso de 3 Aulas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --canvas:#FBF9F4;
+    --ink:#1F2A24;
+    --muted:#6B7568;
+    --accent:#2E7D5B;
+    --accent-soft:#E4EEE7;
+    --amber:#D9A441;
+    --code-bg:#10231B;
+    --code-text:#E7F1EA;
+    --line:#DFDACB;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--canvas);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  code, pre, .mono{
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* ---------- Header / hero ---------- */
+  header.hero{
+    padding:4.5rem 6vw 3rem;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    margin-bottom:0.9rem;
+  }
+  header.hero h1{
+    font-size:clamp(2.1rem, 4.4vw, 3.4rem);
+    margin:0 0 1rem;
+    max-width:16ch;
+  }
+  header.hero p.lede{
+    max-width:56ch;
+    color:var(--muted);
+    font-size:1.08rem;
+    margin:0 0 2.2rem;
+  }
+  .terminal{
+    max-width:560px;
+    background:var(--code-bg);
+    border-radius:10px;
+    box-shadow:0 18px 40px -20px rgba(16,35,27,0.55);
+    overflow:hidden;
+  }
+  .terminal .bar{
+    display:flex;
+    gap:6px;
+    padding:10px 14px;
+    background:#0B1913;
+  }
+  .terminal .bar span{
+    width:10px;height:10px;border-radius:50%;
+    background:#3a4a41;
+  }
+  .terminal pre{
+    margin:0;
+    padding:1.1rem 1.4rem 1.4rem;
+    color:var(--code-text);
+    font-size:0.85rem;
+    line-height:1.7;
+    overflow-x:auto;
+  }
+  .terminal .prompt{color:var(--amber);}
+  .terminal .ok{color:#9FD8B8;}
+
+  /* ---------- Progress / nav ---------- */
+  nav.classnav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    background:var(--canvas);
+    border-bottom:1px solid var(--line);
+    padding:0 6vw;
+  }
+  nav.classnav button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    background:none;
+    border:none;
+    padding:1.1rem 1.3rem;
+    cursor:pointer;
+    color:var(--muted);
+    border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  nav.classnav button .n{
+    color:var(--accent);
+    margin-right:0.4rem;
+  }
+  nav.classnav button.active{
+    color:var(--ink);
+    border-bottom-color:var(--accent);
+  }
+  nav.classnav button:hover{ color:var(--ink); }
+
+  /* ---------- Main layout ---------- */
+  main{
+    padding:3rem 6vw 6rem;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .class-panel{ display:none; }
+  .class-panel.active{ display:block; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .class-head{
+    margin-bottom:2.4rem;
+  }
+  .class-head .tag{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:0.3rem 0.7rem;
+    border-radius:999px;
+    margin-bottom:0.8rem;
+  }
+  .class-head h2{
+    font-size:clamp(1.6rem,3vw,2.1rem);
+    margin:0 0 0.5rem;
+  }
+  .class-head p{
+    color:var(--muted);
+    max-width:60ch;
+    margin:0;
+  }
+
+  /* agenda timeline */
+  .agenda{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:0.2rem 1.2rem;
+    margin:2rem 0 3rem;
+    padding:1.4rem 1.6rem;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .agenda .time{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    color:var(--accent);
+    padding:0.5rem 0;
+    white-space:nowrap;
+  }
+  .agenda .item{
+    padding:0.5rem 0;
+    border-bottom:1px dashed var(--line);
+    font-size:0.95rem;
+  }
+  .agenda .time:last-of-type, .agenda .item:last-of-type{ border-bottom:none; }
+
+  /* lesson blocks */
+  .lesson{
+    margin:2.6rem 0;
+    padding-top:2.2rem;
+    border-top:1px solid var(--line);
+  }
+  .lesson:first-of-type{ border-top:none; padding-top:0; }
+  .lesson h3{
+    font-size:1.3rem;
+    margin:0 0 0.7rem;
+    display:flex;
+    align-items:baseline;
+    gap:0.6rem;
+  }
+  .lesson h3 .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    color:var(--accent);
+  }
+  .lesson p{ margin:0 0 1rem; }
+  .lesson pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:1.1rem 1.3rem;
+    border-radius:8px;
+    overflow-x:auto;
+    font-size:0.87rem;
+    line-height:1.65;
+    margin:0 0 1.2rem;
+  }
+  .lesson code.inline{
+    background:var(--accent-soft);
+    color:#1B4A34;
+    padding:0.12rem 0.4rem;
+    border-radius:4px;
+    font-size:0.88em;
+  }
+  .callout{
+    border-left:3px solid var(--amber);
+    background:#FBF4E6;
+    padding:0.8rem 1.1rem;
+    border-radius:0 6px 6px 0;
+    font-size:0.93rem;
+    margin:0 0 1.2rem;
+  }
+
+  /* exercises */
+  .exercise{
+    margin-top:1.2rem;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--white);
+    overflow:hidden;
+  }
+  .exercise .ex-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:1rem 1.3rem;
+    background:var(--accent-soft);
+  }
+  .exercise .ex-head strong{
+    font-size:0.95rem;
+    color:#1B4A34;
+  }
+  .exercise .ex-head .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+  .exercise .ex-body{
+    padding:1.1rem 1.3rem 0.4rem;
+  }
+  .exercise .ex-body pre{ margin-top:0.6rem; }
+  .reveal-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    background:var(--ink);
+    color:var(--canvas);
+    border:none;
+    padding:0.55rem 1rem;
+    border-radius:6px;
+    cursor:pointer;
+    margin:0.6rem 0 1.2rem;
+  }
+  .reveal-btn:hover{ background:var(--accent); }
+  .solution{
+    display:none;
+    padding:0 1.3rem 1.2rem;
+  }
+  .solution.shown{ display:block; }
+  .solution .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin-bottom:0.5rem;
+  }
+
+  /* class switch footer */
+  .class-switch{
+    display:flex;
+    justify-content:space-between;
+    margin-top:3.5rem;
+    padding-top:1.6rem;
+    border-top:1px solid var(--line);
+  }
+  .class-switch button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    background:none;
+    border:1px solid var(--line);
+    padding:0.7rem 1.1rem;
+    border-radius:7px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .class-switch button:hover{ border-color:var(--accent); color:var(--accent); }
+  .class-switch .spacer{ flex:1; }
+
+  footer{
+    text-align:center;
+    padding:2.5rem 1rem 3rem;
+    color:var(--muted);
+    font-size:0.85rem;
+  }
+
+  @media (max-width:640px){
+    header.hero{ padding:3rem 5vw 2.2rem; }
+    main{ padding:2.2rem 5vw 4rem; }
+    nav.classnav{ padding:0 5vw; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">python · framework web</div>
+  <h1>Flask, do Zero</h1>
+  <p class="lede">Três aulas de 4 horas que levam você de uma pasta vazia a uma aplicação web funcional, com banco de dados — rotas, templates, formulários e um projeto pequeno que você realmente vai terminar.</p>
+  <div class="terminal">
+    <div class="bar"><span></span><span></span><span></span></div>
+    <pre><span class="prompt">$</span> python -m venv venv && source venv/bin/activate
+<span class="prompt">$</span> pip install flask
+<span class="prompt">$</span> flask --app app run --debug
+<span class="ok"> * Running on http://127.0.0.1:5000</span></pre>
+  </div>
+</header>
+
+<nav class="classnav">
+  <button class="tab active" data-target="c1"><span class="n">01</span>Fundamentos</button>
+  <button class="tab" data-target="c2"><span class="n">02</span>Formulários e Dados</button>
+  <button class="tab" data-target="c3"><span class="n">03</span>Projeto Completo</button>
+</nav>
+
+<main>
+
+  <!-- ================= AULA 1 ================= -->
+  <section id="c1" class="class-panel active">
+    <div class="class-head">
+      <span class="tag">Aula 01 · 4 horas</span>
+      <h2>Fundamentos: rotas, templates e o servidor</h2>
+      <p>Ao final, os alunos terão o Flask instalado, entenderão o que é uma rota e serão capazes de renderizar HTML dinâmico com templates Jinja2.</p>
+    </div>
+
+    <div class="agenda">
+      <div class="time">0:00 – 0:30</div><div class="item">O que é um framework web? Cliente/servidor, requisições e respostas, por que Flask</div>
+      <div class="time">0:30 – 1:15</div><div class="item">Configuração do ambiente, primeira aplicação, servidor de desenvolvimento, modo debug</div>
+      <div class="time">1:15 – 1:30</div><div class="item">Intervalo</div>
+      <div class="time">1:30 – 2:30</div><div class="item">Rotas, parâmetros de URL, métodos HTTP</div>
+      <div class="time">2:30 – 3:15</div><div class="item">Templates com Jinja2: variáveis, loops, condicionais, herança de templates</div>
+      <div class="time">3:15 – 3:45</div><div class="item">Arquivos estáticos (CSS/imagens) e ligação entre páginas</div>
+      <div class="time">3:45 – 4:00</div><div class="item">Encerramento + exercício para casa</div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">1.1</span> Sua primeira aplicação Flask</h3>
+      <p>Uma aplicação Flask é apenas um arquivo Python que cria um objeto <code class="inline">app</code> e associa funções a URLs. Cada função é chamada de <strong>view</strong>.</p>
+      <pre># app.py
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "&lt;h1&gt;Olá, Flask!&lt;/h1&gt;"</pre>
+      <p>Execute com <code class="inline">flask --app app run --debug</code> e acesse <code class="inline">http://127.0.0.1:5000</code>. O modo debug recarrega automaticamente ao salvar e mostra páginas de erro legíveis.</p>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 1.1 — Olá, você</strong><span class="badge">10 min</span></div>
+        <div class="ex-body">
+          <p>Adicione uma rota <code class="inline">/sobre</code> que retorne um parágrafo curto sobre você. Depois adicione uma rota <code class="inline">/cardapio</code> que retorne uma lista HTML com 3 das suas comidas favoritas.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s1')">Mostrar solução</button>
+          <div class="solution" id="s1">
+            <div class="label">Solução</div>
+            <pre>@app.route("/sobre")
+def sobre():
+    return "&lt;p&gt;Estou aprendendo Flask esta semana.&lt;/p&gt;"
+
+@app.route("/cardapio")
+def cardapio():
+    return "&lt;ul&gt;&lt;li&gt;Pizza&lt;/li&gt;&lt;li&gt;Sushi&lt;/li&gt;&lt;li&gt;Tacos&lt;/li&gt;&lt;/ul&gt;"</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">1.2</span> Rotas dinâmicas</h3>
+      <p>Trechos da URL podem ser capturados como variáveis e passados diretamente para a função de view.</p>
+      <pre>@app.route("/ola/&lt;nome&gt;")
+def ola(nome):
+    return f"&lt;h1&gt;Oi, {nome}!&lt;/h1&gt;"
+
+@app.route("/quadrado/&lt;int:n&gt;")
+def quadrado(n):
+    return f"O quadrado de {n} é {n * n}"</pre>
+      <div class="callout">Conversores de tipo como <code class="inline">&lt;int:n&gt;</code> validam a URL automaticamente — acessar <code class="inline">/quadrado/abc</code> retorna um erro 404 sem código extra.</div>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 1.2 — Mini calculadora</strong><span class="badge">15 min</span></div>
+        <div class="ex-body">
+          <p>Crie uma rota <code class="inline">/soma/&lt;int:a&gt;/&lt;int:b&gt;</code> que retorne a soma de <code class="inline">a</code> e <code class="inline">b</code> em forma de frase, por exemplo "3 + 4 = 7".</p>
+          <button class="reveal-btn" onclick="toggleSolution('s2')">Mostrar solução</button>
+          <div class="solution" id="s2">
+            <div class="label">Solução</div>
+            <pre>@app.route("/soma/&lt;int:a&gt;/&lt;int:b&gt;")
+def soma(a, b):
+    return f"{a} + {b} = {a + b}"</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">1.3</span> Templates com Jinja2</h3>
+      <p>Em vez de retornar strings puras, renderize arquivos HTML guardados numa pasta <code class="inline">templates/</code>. O Jinja2 permite inserir lógica parecida com Python dentro do HTML usando <code class="inline">{{ }}</code> e <code class="inline">{% %}</code>.</p>
+      <pre># app.py
+from flask import Flask, render_template
+
+@app.route("/perfil/&lt;nome&gt;")
+def perfil(nome):
+    habilidades = ["Python", "HTML", "Flask"]
+    return render_template("perfil.html", nome=nome, habilidades=habilidades)</pre>
+      <pre>&lt;!-- templates/perfil.html --&gt;
+&lt;h1&gt;Perfil de {{ nome }}&lt;/h1&gt;
+&lt;ul&gt;
+  {% for h in habilidades %}
+    &lt;li&gt;{{ h }}&lt;/li&gt;
+  {% endfor %}
+&lt;/ul&gt;</pre>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 1.3 — Herança de templates</strong><span class="badge">20 min</span></div>
+        <div class="ex-body">
+          <p>Crie um <code class="inline">base.html</code> com <code class="inline">{% block content %}{% endblock %}</code>, e faça <code class="inline">home.html</code> e <code class="inline">sobre.html</code> herdarem dele, para que ambas as páginas compartilhem o mesmo cabeçalho/menu.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s3')">Mostrar solução</button>
+          <div class="solution" id="s3">
+            <div class="label">Solução</div>
+            <pre>&lt;!-- templates/base.html --&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;{% block title %}Meu Site{% endblock %}&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;nav&gt;&lt;a href="/"&gt;Início&lt;/a&gt; | &lt;a href="/sobre"&gt;Sobre&lt;/a&gt;&lt;/nav&gt;
+  {% block content %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- templates/home.html --&gt;
+{% extends "base.html" %}
+{% block content %}
+  &lt;h1&gt;Bem-vindo&lt;/h1&gt;
+{% endblock %}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-switch">
+      <div class="spacer"></div>
+      <button onclick="goTo('c2')">Próxima: Formulários e Dados →</button>
+    </div>
+  </section>
+
+  <!-- ================= AULA 2 ================= -->
+  <section id="c2" class="class-panel">
+    <div class="class-head">
+      <span class="tag">Aula 02 · 4 horas</span>
+      <h2>Formulários, dados da requisição e banco de dados</h2>
+      <p>Os alunos vão lidar com envio de formulários, entender a diferença entre GET e POST, e persistir dados com SQLite via Flask-SQLAlchemy.</p>
+    </div>
+
+    <div class="agenda">
+      <div class="time">0:00 – 0:15</div><div class="item">Revisão: rotas e templates da aula 1</div>
+      <div class="time">0:15 – 1:00</div><div class="item">Formulários HTML, GET vs POST, leitura de dados com <code class="inline">request</code></div>
+      <div class="time">1:00 – 1:45</div><div class="item">Validação de formulários e mensagens flash</div>
+      <div class="time">1:45 – 2:00</div><div class="item">Intervalo</div>
+      <div class="time">2:00 – 2:45</div><div class="item">Introdução ao Flask-SQLAlchemy: models, migrações, o arquivo de banco</div>
+      <div class="time">2:45 – 3:30</div><div class="item">Criar, ler, atualizar e apagar registros (CRUD) a partir de uma rota</div>
+      <div class="time">3:30 – 4:00</div><div class="item">Exercício guiado: uma lista de "notas" salva no banco de dados</div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">2.1</span> Lidando com envios de formulário</h3>
+      <p>Formulários enviam dados via GET (na própria URL) ou POST (no corpo da requisição). Use <code class="inline">request.form</code> para ler dados de POST.</p>
+      <pre>from flask import request
+
+@app.route("/contato", methods=["GET", "POST"])
+def contato():
+    if request.method == "POST":
+        nome = request.form["nome"]
+        return f"Obrigado, {nome}!"
+    return render_template("contato.html")</pre>
+      <pre>&lt;!-- templates/contato.html --&gt;
+&lt;form method="POST"&gt;
+  &lt;input name="nome" placeholder="Seu nome"&gt;
+  &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</pre>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 2.1 — Formulário de feedback</strong><span class="badge">20 min</span></div>
+        <div class="ex-body">
+          <p>Crie uma rota <code class="inline">/feedback</code> com um formulário que colete <code class="inline">nota</code> (1–5) e <code class="inline">comentario</code>. No POST, renderize um template de "obrigado" que exiba os dois valores de volta.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s4')">Mostrar solução</button>
+          <div class="solution" id="s4">
+            <div class="label">Solução</div>
+            <pre>@app.route("/feedback", methods=["GET", "POST"])
+def feedback():
+    if request.method == "POST":
+        nota = request.form["nota"]
+        comentario = request.form["comentario"]
+        return render_template("obrigado.html", nota=nota, comentario=comentario)
+    return render_template("feedback.html")</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">2.2</span> Banco de dados com Flask-SQLAlchemy</h3>
+      <p>Instale com <code class="inline">pip install flask-sqlalchemy</code>. Um model é uma classe Python que representa uma tabela do banco.</p>
+      <pre>from flask_sqlalchemy import SQLAlchemy
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+db = SQLAlchemy(app)
+
+class Nota(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    texto = db.Column(db.String(200), nullable=False)
+
+with app.app_context():
+    db.create_all()</pre>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 2.2 — Salvar notas no banco</strong><span class="badge">25 min</span></div>
+        <div class="ex-body">
+          <p>Adicione uma rota <code class="inline">/notas</code> que: no GET, mostre um formulário e liste todas as notas existentes; no POST, salve uma nova <code class="inline">Nota</code> e redirecione de volta para <code class="inline">/notas</code>.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s5')">Mostrar solução</button>
+          <div class="solution" id="s5">
+            <div class="label">Solução</div>
+            <pre>from flask import redirect, url_for
+
+@app.route("/notas", methods=["GET", "POST"])
+def notas():
+    if request.method == "POST":
+        nova_nota = Nota(texto=request.form["texto"])
+        db.session.add(nova_nota)
+        db.session.commit()
+        return redirect(url_for("notas"))
+    todas_notas = Nota.query.all()
+    return render_template("notas.html", notas=todas_notas)</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-switch">
+      <button onclick="goTo('c1')">← Anterior: Fundamentos</button>
+      <div class="spacer"></div>
+      <button onclick="goTo('c3')">Próxima: Projeto Completo →</button>
+    </div>
+  </section>
+
+  <!-- ================= AULA 3 ================= -->
+  <section id="c3" class="class-panel">
+    <div class="class-head">
+      <span class="tag">Aula 03 · 4 horas</span>
+      <h2>Juntando tudo: um pequeno projeto CRUD</h2>
+      <p>Os alunos combinam tudo em uma única aplicação — um "Gerenciador de Tarefas" com criar/ler/atualizar/apagar completo — e conhecem os fundamentos de deploy.</p>
+    </div>
+
+    <div class="agenda">
+      <div class="time">0:00 – 0:15</div><div class="item">Revisão das aulas 1 e 2, briefing do projeto de hoje</div>
+      <div class="time">0:15 – 1:15</div><div class="item">Estrutura do Gerenciador de Tarefas: model, listagem, formulário de adicionar tarefa</div>
+      <div class="time">1:15 – 1:30</div><div class="item">Intervalo</div>
+      <div class="time">1:30 – 2:15</div><div class="item">Marcar tarefas como concluídas / apagar tarefas (rotas de atualizar e apagar)</div>
+      <div class="time">2:15 – 2:45</div><div class="item">Sessões e mensagens flash para feedback ao usuário</div>
+      <div class="time">2:45 – 3:15</div><div class="item">Estilização básica com um template base compartilhado</div>
+      <div class="time">3:15 – 3:45</div><div class="item">Fundamentos de deploy: <code class="inline">requirements.txt</code>, variáveis de ambiente, uma nota sobre hospedagem</div>
+      <div class="time">3:45 – 4:00</div><div class="item">Show &amp; tell — cada aluno apresenta seu gerenciador de tarefas</div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">3.1</span> O model Tarefa</h3>
+      <pre>class Tarefa(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(120), nullable=False)
+    feita = db.Column(db.Boolean, default=False)
+
+@app.route("/")
+def index():
+    tarefas = Tarefa.query.all()
+    return render_template("index.html", tarefas=tarefas)
+
+@app.route("/adicionar", methods=["POST"])
+def adicionar():
+    titulo = request.form["titulo"]
+    if titulo.strip():
+        db.session.add(Tarefa(titulo=titulo))
+        db.session.commit()
+    return redirect(url_for("index"))</pre>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 3.1 — Montar a página de listagem</strong><span class="badge">25 min</span></div>
+        <div class="ex-body">
+          <p>Construa <code class="inline">templates/index.html</code>: um formulário de adicionar tarefa que envie POST para <code class="inline">/adicionar</code>, e uma lista que percorra <code class="inline">tarefas</code>, mostrando cada título riscado quando <code class="inline">feita</code> for verdadeiro.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s6')">Mostrar solução</button>
+          <div class="solution" id="s6">
+            <div class="label">Solução</div>
+            <pre>&lt;form method="POST" action="/adicionar"&gt;
+  &lt;input name="titulo" placeholder="Nova tarefa"&gt;
+  &lt;button type="submit"&gt;Adicionar&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;ul&gt;
+  {% for tarefa in tarefas %}
+    &lt;li style="{{ 'text-decoration: line-through;' if tarefa.feita }}"&gt;
+      {{ tarefa.titulo }}
+    &lt;/li&gt;
+  {% endfor %}
+&lt;/ul&gt;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">3.2</span> Concluir e apagar</h3>
+      <pre>@app.route("/concluir/&lt;int:tarefa_id&gt;")
+def concluir(tarefa_id):
+    tarefa = Tarefa.query.get_or_404(tarefa_id)
+    tarefa.feita = not tarefa.feita
+    db.session.commit()
+    return redirect(url_for("index"))
+
+@app.route("/apagar/&lt;int:tarefa_id&gt;")
+def apagar(tarefa_id):
+    tarefa = Tarefa.query.get_or_404(tarefa_id)
+    db.session.delete(tarefa)
+    db.session.commit()
+    return redirect(url_for("index"))</pre>
+      <div class="callout">Em uma aplicação de produção, ações destrutivas como apagar deveriam usar POST, não GET — requisições GET podem ser disparadas por links, crawlers ou prefetch do navegador.</div>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 3.2 — Finalizar o gerenciador</strong><span class="badge">30 min</span></div>
+        <div class="ex-body">
+          <p>Adicione links/botões "Concluir" e "Apagar" ao lado de cada tarefa em <code class="inline">index.html</code>, apontando para as rotas acima. Depois adicione uma mensagem flash ("Tarefa adicionada!", "Tarefa apagada.") após cada ação.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s7')">Mostrar solução</button>
+          <div class="solution" id="s7">
+            <div class="label">Solução</div>
+            <pre>from flask import flash
+
+app.secret_key = "dev"  # necessário para mensagens flash
+
+@app.route("/apagar/&lt;int:tarefa_id&gt;")
+def apagar(tarefa_id):
+    tarefa = Tarefa.query.get_or_404(tarefa_id)
+    db.session.delete(tarefa)
+    db.session.commit()
+    flash("Tarefa apagada.")
+    return redirect(url_for("index"))
+
+&lt;!-- em index.html, acima da lista --&gt;
+{% for mensagem in get_flashed_messages() %}
+  &lt;p&gt;{{ mensagem }}&lt;/p&gt;
+{% endfor %}
+
+&lt;a href="{{ url_for('concluir', tarefa_id=tarefa.id) }}"&gt;Concluir&lt;/a&gt;
+&lt;a href="{{ url_for('apagar', tarefa_id=tarefa.id) }}"&gt;Apagar&lt;/a&gt;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson">
+      <h3><span class="num">3.3</span> Fundamentos de deploy</h3>
+      <p>Congele as dependências e desative o modo debug antes de publicar:</p>
+      <pre>pip freeze > requirements.txt</pre>
+      <div class="callout">Nunca rode com <code class="inline">debug=True</code> em produção — isso expõe um depurador interativo capaz de executar código arbitrário. Use uma variável de ambiente para ativá-lo, e rode a aplicação atrás de um servidor de produção como o <code class="inline">gunicorn</code>, em vez do servidor de desenvolvimento do Flask.</div>
+
+      <div class="exercise">
+        <div class="ex-head"><strong>Exercício 3.3 — Checklist antes de publicar</strong><span class="badge">15 min</span></div>
+        <div class="ex-body">
+          <p>Gere o <code class="inline">requirements.txt</code> do seu projeto, e altere o final de <code class="inline">app.py</code> para que o modo debug só seja ativado quando a variável de ambiente <code class="inline">FLASK_DEBUG</code> estiver definida como <code class="inline">"1"</code>.</p>
+          <button class="reveal-btn" onclick="toggleSolution('s8')">Mostrar solução</button>
+          <div class="solution" id="s8">
+            <div class="label">Solução</div>
+            <pre>import os
+
+if __name__ == "__main__":
+    modo_debug = os.environ.get("FLASK_DEBUG") == "1"
+    app.run(debug=modo_debug)</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-switch">
+      <button onclick="goTo('c2')">← Anterior: Formulários e Dados</button>
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>Flask, do Zero — um curso de 3 aulas, 12 horas.</footer>
+
+<script>
+  function goTo(id){
+    document.querySelectorAll('.class-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelector(`.tab[data-target="${id}"]`).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=> goTo(btn.dataset.target));
+  });
+  function toggleSolution(id){
+    const el = document.getElementById(id);
+    el.classList.toggle('shown');
+    const btn = el.previousElementSibling;
+    btn.textContent = el.classList.contains('shown') ? 'Ocultar solução' : 'Mostrar solução';
+  }
+</script>
+
+</body>
+</html>
